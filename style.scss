@@ -1,0 +1,19 @@
+html,
+body,
+canvas {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+body {
+  display: flex;
+  background-color: #092344;
+  justify-content: center;
+}
+
+@media only screen and (max-width: 800px) {
+  canvas {
+    width: 100%;
+  }
+}

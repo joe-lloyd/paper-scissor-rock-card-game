@@ -1,0 +1,24 @@
+{
+  "name": "@joe-lloyd/flappy-bird-phaser",
+  "version": "1.1.7",
+  "repository": "git@github.com:joe-lloyd/phaser-game-flappy-bird.git",
+  "main": "lib/index.js",
+  "types": "lib",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "scripts": {
+    "dev": "parcel index.html",
+    "build": "parcel build index.html",
+    "build:package": "parcel build index.ts --public-url ./node_modules/@joe-lloyd/paper-scissor-rock/lib --out-dir lib"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "sass": "^1.26.10",
+    "typescript": "^4.0.2",
+    "@types/node": "^14.6.4"
+  },
+  "peerDependencies": {
+    "phaser": "^3.24.1"
+  }
+}
