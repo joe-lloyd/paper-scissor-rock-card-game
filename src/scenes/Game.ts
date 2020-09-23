@@ -20,6 +20,7 @@ class Game extends Scene {
 
     update(time: number, delta: number) {
         super.update(time, delta);
+        this.Cards.update();
     }
 }
 
