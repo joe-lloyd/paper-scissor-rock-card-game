@@ -25,13 +25,21 @@ class Cards {
 }
 
 class Card extends Phaser.GameObjects.Image {
+    initialX: number;
+    initialY: number;
+
     constructor(scene, x, y, texture) {
         super(scene, x, y, texture);
+        this.initialX = x;
+        this.initialY = y;
 
         this.setInteractive({ draggable: true });
 
         this.on('drag', (pointer, dragX, dragY) => {
             this.setPosition(dragX, dragY);
+        });
+        this.on('dragend', (pointer, dragX, dragY) => {
+            this.setPosition(x, y);
         });
     }
 
