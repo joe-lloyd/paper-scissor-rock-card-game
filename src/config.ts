@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import Game from "./scenes/Game";
 
 const config = {
     type: Phaser.AUTO,
@@ -14,7 +15,7 @@ const config = {
             debug: process.env.DEBUGMODE === 'true',
         }
     },
-    scene: []
+    scene: [Game]
 };
 
 export default config;
