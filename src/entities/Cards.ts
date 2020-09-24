@@ -34,45 +34,42 @@ class Cards {
     }
 }
 
-class Card extends Phaser.GameObjects.Image {
+class Card extends Phaser.Physics.Arcade.Sprite {
     initialX: number;
     initialY: number;
     isDragging: boolean;
+    isStationary: boolean;
+    xPositive: boolean;
+    yPositive: boolean;
 
-    constructor(scene, x, y, texture) {
+    constructor(scene: Game, x, y, texture) {
         super(scene, x, y, texture);
+        this.scene = scene;
         this.initialX = x;
         this.initialY = y;
         this.scale = 2
-
         this.setInteractive({ draggable: true });
+        this.scene.physics.add.existing(this);
 
         this.on('drag', (pointer, dragX, dragY) => {
             this.setPosition(dragX, dragY);
             this.isDragging = true;
+            this.isStationary = false;
         });
         this.on('dragend', (pointer, dragX, dragY) => {
-            this.isDragging = false;
+            this.xPositive = dragX > this.initialX;
+            this.yPositive = dragY > this.initialY;
+            this.scene.physics.moveTo(this, this.initialX, this.initialY, 200, 200);
         });
     }
 
     update(...args) {
         super.update(...args);
-        if (!this.isDragging) {
-            if (this.x !== this.initialX) {
-                if (this.x > this.initialX) {
-                    this.setX(this.x * 0.9);
-                } else if (this.x < this.initialX) {
-                    this.setX(this.x * 1.1);
-                }
-            }
-            if (this.y !== this.initialY) {
-                if (this.y > this.initialY) {
-                    this.setY(this.y * 0.9);
-                } else if (this.y < this.initialY) {
-                    this.setY(this.y * 1.1);
-                }
-            }
+        if (this.xPositive && this.x <= this.initialX || !this.xPositive && this.x >= this.initialX) {
+            this.setVelocityX(0);
+        }
+        if (this.yPositive && this.y <= this.initialY || !this.yPositive && this.y >= this.initialY) {
+            this.setVelocityY(0);
         }
     }
 }
