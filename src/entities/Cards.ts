@@ -34,13 +34,9 @@ class Cards {
     }
 }
 
-class Card extends Phaser.Physics.Arcade.Sprite {
+class Card extends Phaser.GameObjects.Image {
     initialX: number;
     initialY: number;
-    isDragging: boolean;
-    isStationary: boolean;
-    xPositive: boolean;
-    yPositive: boolean;
 
     constructor(scene: Game, x, y, texture) {
         super(scene, x, y, texture);
@@ -49,28 +45,19 @@ class Card extends Phaser.Physics.Arcade.Sprite {
         this.initialY = y;
         this.scale = 2
         this.setInteractive({ draggable: true });
-        this.scene.physics.add.existing(this);
 
         this.on('drag', (pointer, dragX, dragY) => {
             this.setPosition(dragX, dragY);
-            this.isDragging = true;
-            this.isStationary = false;
         });
-        this.on('dragend', (pointer, dragX, dragY) => {
-            this.xPositive = dragX > this.initialX;
-            this.yPositive = dragY > this.initialY;
-            this.scene.physics.moveTo(this, this.initialX, this.initialY, 200, 200);
+        this.on('dragend', () => {
+            scene.tweens.add({
+                targets: this,
+                x: this.initialX,
+                y: this.initialY,
+                duration: 300,
+                ease: 'Circ',
+            });
         });
-    }
-
-    update(...args) {
-        super.update(...args);
-        if (this.xPositive && this.x <= this.initialX || !this.xPositive && this.x >= this.initialX) {
-            this.setVelocityX(0);
-        }
-        if (this.yPositive && this.y <= this.initialY || !this.yPositive && this.y >= this.initialY) {
-            this.setVelocityY(0);
-        }
     }
 }
 
