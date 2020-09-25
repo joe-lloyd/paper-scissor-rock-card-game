@@ -104,28 +104,19 @@ class Card extends Phaser.Physics.Arcade.Image {
 
     handleDragEnd = () => {
         this.tweens.scaleDown.play();
-
-        if (this.scene.PlayMat.playMat.selectedCard === this.id) {
+        if (this.scene.physics.overlap(this, this.scene.PlayMat.playMat)) {
+            this.scene.PlayMat.playMat.setCard(this.id);
             this.tweens.playCard.play();
+        } else if (this.scene.PlayMat.playMat.selectedCard === this.id) {
+            this.tweens.resetCard.play();
+            this.scene.PlayMat.playMat.setCard(undefined);
         } else {
             this.tweens.resetCard.play();
         }
     }
 
-    /**
-     * Set if the card was selected by moving it over the other play area
-     *
-     */
-    setCardSelected = () => {
-        if (this.scene.physics.overlap(this, this.scene.PlayMat.playMat)) {
-            this.scene.PlayMat.playMat.setCard(this.id);
-        } else if (!this.scene.physics.overlap(this, this.scene.PlayMat.playMat)) {
-            this.scene.PlayMat.playMat.setCard(undefined);
-        }
-    }
-
     update() {
-        this.setCardSelected();
+
     }
 }
 
