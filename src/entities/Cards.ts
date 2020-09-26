@@ -45,7 +45,7 @@ class Card extends Phaser.Physics.Arcade.Image {
     id: CardIds
     initialX: number;
     initialY: number;
-    tweens: {[key: string]: Phaser.Tweens.Tween};
+    tweens: {[key: string]: () => Phaser.Tweens.Tween};
 
     constructor(scene: Game, x, y, texture, id) {
         super(scene, x, y, texture);
@@ -57,6 +57,7 @@ class Card extends Phaser.Physics.Arcade.Image {
         this.setInteractive({ draggable: true });
         scene.physics.world.enable(this);
         this.initTweens();
+        this.setDepth(1);
 
         this.on('drag', this.handleDragCard);
         this.on('dragstart', this.handleDragStart)
@@ -65,31 +66,37 @@ class Card extends Phaser.Physics.Arcade.Image {
 
     initTweens = () => {
         this.tweens = {
-            scaleUp: this.scene.tweens.create({
+            scaleUp: () => this.scene.tweens.add({
                 targets: this,
                 scale: 2.4,
                 duration: 100,
                 ease: 'Circ',
             }),
-            scaleDown: this.scene.tweens.create({
+            scaleDown: () => this.scene.tweens.add({
                 targets: this,
                 scale: 2,
                 duration: 100,
                 ease: 'Circ',
             }),
-            playCard: this.scene.tweens.create({
+            playCard: () => this.scene.tweens.add({
                 targets: this,
                 x: this.scene.PlayMat.playMat.x,
                 y: this.scene.PlayMat.playMat.y,
                 duration: 300,
                 ease: 'Circ',
             }),
-            resetCard: this.scene.tweens.create({
+            resetCard: () => this.scene.tweens.add({
                 targets: this,
                 x: this.initialX,
                 y: this.initialY,
                 duration: 300,
                 ease: 'Circ',
+                onStart: (ween, git) => {
+                    console.log('started reset');
+                },
+                onComplete: (ween, git) => {
+                    console.log('complete reset');
+                },
             })
         }
     }
@@ -99,19 +106,24 @@ class Card extends Phaser.Physics.Arcade.Image {
     }
 
     handleDragStart =  () => {
-        this.tweens.scaleUp.play();
+        this.tweens.scaleUp();
+        this.setDepth(2);
     }
 
     handleDragEnd = () => {
-        this.tweens.scaleDown.play();
-        if (this.scene.physics.overlap(this, this.scene.PlayMat.playMat)) {
+        this.tweens.scaleDown();
+        this.setDepth(1);
+
+        if (this.scene.PlayMat.playMat.selectedCard && this.scene.PlayMat.playMat.selectedCard !== this.id && this.scene.physics.overlap(this, this.scene.PlayMat.playMat)) {
+            this.tweens.resetCard();
+        } else if (this.scene.physics.overlap(this, this.scene.PlayMat.playMat)) {
             this.scene.PlayMat.playMat.setCard(this.id);
-            this.tweens.playCard.play();
+            this.tweens.playCard();
         } else if (this.scene.PlayMat.playMat.selectedCard === this.id) {
-            this.tweens.resetCard.play();
+            this.tweens.resetCard();
             this.scene.PlayMat.playMat.setCard(undefined);
         } else {
-            this.tweens.resetCard.play();
+            this.tweens.resetCard();
         }
     }
 
