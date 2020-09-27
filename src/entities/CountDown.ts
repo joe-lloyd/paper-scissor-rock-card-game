@@ -9,7 +9,7 @@ class CountDownController {
   }
 
   update() {
-    
+
   }
 }
 
