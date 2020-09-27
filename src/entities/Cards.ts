@@ -3,14 +3,15 @@ import PaperCard from '../assets/images/paper-card.png';
 import ScissorCard from '../assets/images/scissor-card.png';
 import RockCard from '../assets/images/rock-card.png';
 import Game from "../scenes/Game";
+import {RoundState} from "./RoundTracker";
 
 enum CardIds {
-    PAPER = 'paper',
-    SCISSOR = 'scissor',
-    ROCK = 'rock',
+    PAPER,
+    SCISSOR,
+    ROCK,
 }
 
-class CardsController {
+class PlayerCardsController {
     paperCard: Card;
     scissorCard: Card;
     rockCard: Card;
@@ -32,11 +33,44 @@ class CardsController {
         scene.load.image('scissor-card', ScissorCard);
         scene.load.image('rock-card', RockCard);
     }
+}
+
+class AiCardsController {
+    scene: Game;
+    paperCard: Card;
+    scissorCard: Card;
+    rockCard: Card;
+    hasSelectCard: boolean;
+
+    constructor(scene: Game) {
+        this.hasSelectCard = false;
+        this.scene = scene;
+        const yCoordinate = 0;
+        this.paperCard = new Card(scene, scene.scale.width / 3, yCoordinate, 'paper-card', CardIds.PAPER, true);
+        this.scissorCard = new Card(scene, scene.scale.width / 2, yCoordinate, 'scissor-card', CardIds.SCISSOR, true);
+        this.rockCard = new Card(scene, (scene.scale.width / 3) * 2, yCoordinate, 'rock-card', CardIds.ROCK, true);
+
+        scene.add.existing(this.paperCard);
+        scene.add.existing(this.scissorCard);
+        scene.add.existing(this.rockCard);
+    }
+
+    selectCard = () => {
+        const randomId = Phaser.Math.Between(0, 2);
+        const card = [
+            this.paperCard,
+            this.scissorCard,
+            this.rockCard,
+        ][randomId];
+        console.log('selected', card);
+        card.aiSelect();
+    }
 
     update() {
-        this.paperCard.update();
-        this.scissorCard.update();
-        this.rockCard.update();
+        if (!this.hasSelectCard && this.scene.RoundTracker.roundState === RoundState.RESULT) {
+            this.hasSelectCard = true;
+            this.selectCard();
+        }
     }
 }
 
@@ -47,14 +81,20 @@ class Card extends Phaser.Physics.Arcade.Image {
     initialY: number;
     tweens: {[key: string]: () => Phaser.Tweens.Tween};
 
-    constructor(scene: Game, x, y, texture, id) {
+    constructor(scene: Game, x, y, texture, id, ai = false) {
         super(scene, x, y, texture);
         this.id = id;
         this.scene = scene;
         this.initialX = x;
         this.initialY = y;
         this.scale = 2
-        this.setInteractive({ draggable: true });
+
+        if (!ai) {
+            this.setInteractive({ draggable: true });
+        } else {
+            this.setOrigin(0.5, 1)
+        }
+
         scene.physics.world.enable(this);
         this.initTweens();
         this.setDepth(1);
@@ -85,6 +125,13 @@ class Card extends Phaser.Physics.Arcade.Image {
                 duration: 300,
                 ease: 'Circ',
             }),
+            aiPlay: () => this.scene.tweens.add({
+                targets: this,
+                x: this.scene.scale.width / 2,
+                y: this.height + this.scene.scale.height * 0.1,
+                duration: 300,
+                ease: 'Circ',
+            }),
             resetCard: () => this.scene.tweens.add({
                 targets: this,
                 x: this.initialX,
@@ -99,6 +146,10 @@ class Card extends Phaser.Physics.Arcade.Image {
                 },
             })
         }
+    }
+
+    aiSelect = () => {
+        this.tweens.aiPlay();
     }
 
     handleDragCard =  (pointer, dragX, dragY) => {
@@ -126,11 +177,7 @@ class Card extends Phaser.Physics.Arcade.Image {
             this.tweens.resetCard();
         }
     }
-
-    update() {
-
-    }
 }
 
-export default CardsController;
-export { CardIds };
+export default PlayerCardsController;
+export { CardIds, AiCardsController };

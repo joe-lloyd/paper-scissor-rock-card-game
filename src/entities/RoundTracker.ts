@@ -42,9 +42,10 @@ class RoundTracker {
       delay: 1000,
       callback: () => {
         counter += 1;
-        this.scene.CountDown.countDownText.setText(`${10 - counter}`);
+        this.scene.CountDown.countDownText.setText(`${3 - counter}`);
 
-        if (counter === 10) {
+        if (counter === 3) {
+          this.roundState = RoundState.RESULT;
           this.roundTimer.remove(false);
         }
       }
@@ -53,3 +54,4 @@ class RoundTracker {
 }
 
 export default RoundTracker;
+export { RoundState };
