@@ -41,6 +41,7 @@ class AiCardsController {
     scissorCard: Card;
     rockCard: Card;
     hasSelectCard: boolean;
+    aiSelectedCard: CardIds;
 
     constructor(scene: Game) {
         this.hasSelectCard = false;
@@ -62,7 +63,7 @@ class AiCardsController {
             this.scissorCard,
             this.rockCard,
         ][randomId];
-        console.log('selected', card);
+        this.aiSelectedCard = card.id;
         card.aiSelect();
     }
 
@@ -138,12 +139,6 @@ class Card extends Phaser.Physics.Arcade.Image {
                 y: this.initialY,
                 duration: 300,
                 ease: 'Circ',
-                onStart: (ween, git) => {
-                    console.log('started reset');
-                },
-                onComplete: (ween, git) => {
-                    console.log('complete reset');
-                },
             })
         }
     }

@@ -3,6 +3,7 @@ import Cards, { AiCardsController } from '../entities/Cards';
 import PlayMat from '../entities/PlayArea';
 import CountDown from '../entities/CountDown';
 import RoundTracker from '../entities/RoundTracker';
+import VictoryController from "../entities/VictoryController";
 
 class Game extends Scene {
     Cards: Cards;
@@ -10,6 +11,7 @@ class Game extends Scene {
     CountDown: CountDown;
     RoundTracker: RoundTracker;
     AiCardsController: AiCardsController;
+    VictoryController: VictoryController;
 
     constructor() {
         super({
@@ -24,6 +26,7 @@ class Game extends Scene {
 
     create() {
         this.cameras.main.backgroundColor.setTo(129, 133, 166);
+        this.VictoryController = new VictoryController(this);
         this.PlayMat = new PlayMat(this);
         this.Cards = new Cards(this);
         this.AiCardsController = new AiCardsController(this);
@@ -33,6 +36,7 @@ class Game extends Scene {
 
     update() {
         this.AiCardsController.update()
+        this.VictoryController.update()
     }
 }
 
